@@ -1,0 +1,156 @@
+name: Staging Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v2.9.0)'
+        required: true
+        type: string
+
+env:
+  TAG: ${{ inputs.tag }}
+
+jobs:
+  image-build-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@v31.3.0
+        with:
+          github_access_token: ''
+
+      - name: Inject github token to nix config
+        run: |
+          cat <<EOF | sudo tee -a /etc/nix/nix.conf
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+          trusted-users = root runner
+          EOF
+
+      - name: Restart Nix daemon
+        run: sudo systemctl restart nix-daemon
+
+      - uses: cachix/install-nix-action@v31.3.0
+
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --run "echo" shell.nix
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push the release images
+        run: |
+          TAG="${TAG#v}"
+          nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh"
+          nix-shell --run "./scripts/release.sh --tag v${TAG} --registry ghcr.io/dev"
+
+  kubectl-plugin:
+    runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: "write"
+      contents: "read"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # NOTE: Update the .krew.yaml file (if required) when making changes here.
+          - os: ubuntu-latest
+            target: linux-musl
+            arch: x86_64
+          # - os: oracle-vm-8cpu-32gb-x86-64
+          #   target: linux-musl
+          #   arch: aarch64
+          # - os: macos-14
+          #   target: apple-darwin
+          #   arch: aarch64
+          # - os: macos-13
+          #   target: apple-darwin
+          #   arch: x86_64
+          # - os: oracle-vm-8cpu-32gb-x86-64
+          #   target: windows-gnu
+          #   arch: x86_64
+          #   suffix: .exe
+    steps:
+      - uses: actions/checkout@v4
+        env:
+          checkout_token: ${{ secrets.ORG_CI_GITHUB }}
+        if: ${{ env.checkout_token == '' }}
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - uses: actions/checkout@v4
+        env:
+          checkout_token: ${{ secrets.ORG_CI_GITHUB }}
+        if: ${{ env.checkout_token != '' }}
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.ORG_CI_GITHUB }}
+      - uses: cachix/install-nix-action@v31.3.0
+        with:
+          enable_kvm: false
+      - run: |
+          nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false --argstr tag "${{ env.TAG }}"
+      - name: Archive executable
+        run: |
+          # NOTE: Update the .krew.yaml file (if required) when making changes here.
+          tar -czvf kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz LICENSE -C result/bin kubectl-openebs${{ matrix.suffix }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}
+          path: kubectl-openebs-${{ matrix.arch }}-${{ matrix.target }}.tar.gz
+          if-no-files-found: error
+
+  release-chart:
+    runs-on: ubuntu-latest
+    needs: ["image-build-push"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v31.3.0
+      - name: Pre-populate nix-shell
+        run: |
+          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          nix-shell --pure --run "echo" ./shell.nix
+
+      - name: Remove prerelease label from dependencies
+        run: |
+          nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh" ./shell.nix
+
+      - name: Set Chart Version
+        run: |
+          CHART_VERSION=$(awk -F': ' '/^version:/ {print $2}' charts/Chart.yaml)
+          echo "CHART_VERSION=$CHART_VERSION" >> $GITHUB_ENV
+
+      - name: Push chart to staging repo
+        uses: appany/helm-oci-chart-releaser@v0.4.2
+        with:
+          name: openebs
+          repository: ${{ env.IMAGE_ORG }}/helm
+          tag: ${{ env.CHART_VERSION }}
+          path: ./charts
+          registry: ghcr.io
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.GITHUB_TOKEN }}
+          update_dependencies: 'true'
+
