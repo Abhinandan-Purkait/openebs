@@ -25,6 +25,8 @@ mkShell {
     commitlint
     cowsay
     git
+    oras
+    crane
     nixpkgs-fmt
     paperclip
     openssl
