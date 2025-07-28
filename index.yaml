@@ -4,7 +4,7 @@ entries:
   - annotations:
       helm.sh/images: |
         - name: etcd
-          image: docker.io/bitnami/etcd:3.5.6-debian-11-r10
+          image: docker.io/bitnami/etcd:3.6.2-debian-12-r0
         - name: kubectl
           image: docker.io/bitnami/kubectl:1.25.15
         - name: alloy
@@ -37,6 +37,8 @@ entries:
           image: docker.io/openebs/mayastor-obs-callhome:develop
         - name: mayastor-operator-diskpool
           image: docker.io/openebs/mayastor-operator-diskpool:develop
+        - name: rawfile-localpv
+          image: docker.io/openebs/rawfile-localpv:v0.11.0
         - name: k8s-sidecar
           image: kiwigrid/k8s-sidecar:1.30.2
         - name: nats
@@ -50,11 +52,13 @@ entries:
         - name: linux-utils
           image: openebs/linux-utils:4.2.0
         - name: lvm-driver
-          image: openebs/lvm-driver:1.7.0
+          image: openebs/lvm-driver:1.8.0-develop
         - name: provisioner-localpv
           image: openebs/provisioner-localpv:4.3.0
+        - name: provisioner-localpv
+          image: openebs/provisioner-localpv:4.4.0-develop
         - name: zfs-driver
-          image: openebs/zfs-driver:2.8.0
+          image: openebs/zfs-driver:2.9.0-develop
         - name: mc
           image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
         - name: minio
@@ -75,13 +79,17 @@ entries:
           image: registry.k8s.io/sig-storage/csi-snapshotter:v7.0.0
         - name: csi-snapshotter
           image: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.0
+        - name: csi-snapshotter
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v8.2.1
         - name: snapshot-controller
           image: registry.k8s.io/sig-storage/snapshot-controller:v7.0.0
         - name: snapshot-controller
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.0
+        - name: snapshot-controller
+          image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 5.10.0
-    created: "2025-07-24T08:47:48.445765613Z"
+    created: "2025-07-28T17:29:20.218762464Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -96,21 +104,25 @@ entries:
       version: 1.0.1
     - name: localpv-provisioner
       repository: https://openebs.github.io/dynamic-localpv-provisioner
-      version: 4.3.0
+      version: 4.4.0-develop
     - condition: engines.local.zfs.enabled
       name: zfs-localpv
       repository: https://openebs.github.io/zfs-localpv
-      version: 2.8.0
+      version: 2.9.0-develop
     - condition: engines.local.lvm.enabled
       name: lvm-localpv
       repository: https://openebs.github.io/lvm-localpv
-      version: 1.7.0
+      version: 1.8.0-develop
+    - condition: engines.local.rawfile.enabled
+      name: rawfile-localpv
+      repository: https://openebs.github.io/rawfile-localpv
+      version: 0.11.0
     - condition: engines.replicated.mayastor.enabled
       name: mayastor
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: 60361766fe8eda99414056ec611c83b17d53c70a71511857bdbb4e024b37f24d
+    digest: cc73b6390a1a4b632b4721eec74f57710de7736e6252aaf2065847fa20000dcc
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -1817,4 +1829,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2025-07-28T16:30:34.824947604Z"
+generated: "2025-07-28T17:29:20.13578985Z"
