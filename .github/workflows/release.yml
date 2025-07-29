@@ -1,9 +1,8 @@
 name: Release Tagging Workflow
 
 on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+**'
+  release:
+    types: [ created ]
 
 jobs:
   release-images:
@@ -37,10 +36,17 @@ jobs:
 
       - name: Mirror images from dev to Docker Hub
         run: |
-          nix-shell --pure --run "./scripts/staging/mirror-images.sh \
+          nix-shell --run "./scripts/staging/mirror-images.sh \
             --source-namespace ghcr.io/abhinandan-purkait/dev \
             --target-namespace docker.io/abhinandanpurkait \
             --tag ${{ github.ref_name }}" ./scripts/staging/shell.nix
+
+      - name: Setup tmate session
+        if: failure()
+        with:
+          detached: true
+        timeout-minutes: 30
+        uses: mxschmitt/action-tmate@v3
 
   release-kubectl-binaries:
     runs-on: ubuntu-latest
@@ -62,7 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          nix-shell --pure --run "./scripts/staging/pull-kubectl-from-ghcr.sh \
+          nix-shell --pure --run "./scripts/staging/push-pull-kubectl.sh pull \
             --tag ${{ github.ref_name }} \
             --namespace ghcr.io/abhinandan-purkait/dev/kubectl-openebs \
             --username ${{ github.actor }} \

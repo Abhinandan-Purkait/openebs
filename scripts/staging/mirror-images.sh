@@ -6,9 +6,18 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]:-"$0"}")")"
-ROOT_DIR="$SCRIPT_DIR/../.."
+
+# if ROOT_DIR is not defined use the one below
+: "${ROOT_DIR:=${SCRIPT_DIR}/../..}"
 
 source "$ROOT_DIR/mayastor/scripts/utils/log.sh"
+NO_RUN=true . "$ROOT_DIR/scripts/release.sh"
+
+IMAGES=()
+for name in $DEFAULT_IMAGES; do
+  image=$($NIX_EVAL -f "$ROOT_DIR" "images.$BUILD_TYPE.$name.imageName" --raw --quiet --argstr product_prefix "$PRODUCT_PREFIX")
+  IMAGES+=("${image#openebs/}")
+done
 
 SOURCE_NAMESPACE=""
 TARGET_NAMESPACE=""
@@ -38,10 +47,6 @@ if [[ -z "$SOURCE_NAMESPACE" ]] || [[ -z "$TARGET_NAMESPACE" ]] || [[ -z "$TAG" 
   log_fatal "Usage: $0 --source-namespace <source> --target-namespace <target> --tag <tag>"
 fi
 
-IMAGES=(
-  "openebs-upgrade-job"
-)
-
 echo "Mirroring images from ${SOURCE_NAMESPACE} to ${TARGET_NAMESPACE} with tag ${TAG}"
 
 for IMAGE in "${IMAGES[@]}"; do
@@ -53,3 +58,4 @@ for IMAGE in "${IMAGES[@]}"; do
 
   echo "✓ Successfully mirrored ${IMAGE}:${TAG}"
 done
+
