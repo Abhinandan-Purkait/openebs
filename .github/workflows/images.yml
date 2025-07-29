@@ -72,9 +72,8 @@ jobs:
       - name: Build and push the release images
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            TAG="${{ inputs.tag }}"
             nix-shell --pure --run "./scripts/helm/update-version-upon-release.sh"
-            nix-shell --run "./scripts/release.sh --tag ${TAG} --registry ${{ inputs.namespace }}"
+            nix-shell --run "./scripts/release.sh --tag ${{ inputs.tag }} --registry ${{ inputs.namespace }}"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             TAG=$(nix-shell --run "yq '.appVersion' charts/Chart.yaml")
             nix-shell --run "./scripts/release.sh --tag v${TAG}"

@@ -33,9 +33,10 @@ jobs:
           - os: macos-14
             target: apple-darwin
             arch: aarch64
-          - os: macos-13
+          - os: macos-14
             target: apple-darwin
             arch: x86_64
+            platform: x86_64-darwin
           - os: ubuntu-latest
             target: windows-gnu
             arch: x86_64
@@ -68,8 +69,8 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             TAG_ARG="--argstr tag ${{ inputs.tag }}"
           fi
-          if [[ "${{ matrix.os }}" == "macos-14" && "${{ matrix.arch }}" == "x86_64" ]]; then
-            SYSTEM_ARG="--argstr system x86_64-darwin"
+          if [[ -n "${{ matrix.platform }}" ]]; then
+            SYSTEM_ARG="--argstr system ${{ matrix.platform }}"
           fi
           nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-openebs --arg incremental false $TAG_ARG $SYSTEM_ARG
 

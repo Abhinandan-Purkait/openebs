@@ -55,7 +55,7 @@ jobs:
 
       - name: Push kubectl binaries to GHCR
         run: |
-          nix-shell --pure --run "./scripts/staging/push-kubectl-to-ghcr.sh \
+          nix-shell --pure --run "./scripts/staging/push-pull-kubectl.sh push\
             --tag ${TAG} \
             --namespace ghcr.io/abhinandan-purkait/dev/kubectl-openebs \
             --username ${{ github.actor }} \
