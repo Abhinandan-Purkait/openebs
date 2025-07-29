@@ -27,12 +27,12 @@ jobs:
           - os: ubuntu-latest
             target: linux-musl
             arch: x86_64
-          - os: ubuntu-latest
-            target: linux-musl
-            arch: aarch64
-          - os: macos-14
-            target: apple-darwin
-            arch: aarch64
+          # - os: ubuntu-latest
+          #   target: linux-musl
+          #   arch: aarch64
+          # - os: macos-14
+          #   target: apple-darwin
+          #   arch: aarch64
           - os: macos-14
             target: apple-darwin
             arch: x86_64

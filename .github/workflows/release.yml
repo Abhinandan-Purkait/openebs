@@ -36,10 +36,17 @@ jobs:
 
       - name: Mirror images from dev to Docker Hub
         run: |
-          nix-shell --pure --run "./scripts/staging/mirror-images.sh \
+          nix-shell --run "./scripts/staging/mirror-images.sh \
             --source-namespace ghcr.io/abhinandan-purkait/dev \
             --target-namespace docker.io/abhinandanpurkait \
             --tag ${{ github.ref_name }}" ./scripts/staging/shell.nix
+
+      - name: Setup tmate session
+        if: failure()
+        with:
+          detached: true
+        timeout-minutes: 30
+        uses: mxschmitt/action-tmate@v3
 
   release-kubectl-binaries:
     runs-on: ubuntu-latest
