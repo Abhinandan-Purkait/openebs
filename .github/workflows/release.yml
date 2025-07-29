@@ -25,7 +25,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ github.repository_owner }}
+          username: abhinandanpurkait
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GHCR
@@ -38,8 +38,8 @@ jobs:
       - name: Mirror images from dev to Docker Hub
         run: |
           nix-shell --pure --run "./scripts/staging/mirror-images.sh \
-            --source-namespace ghcr.io/${{ github.repository_owner }}/dev \
-            --target-namespace docker.io/${{ github.repository_owner }} \
+            --source-namespace ghcr.io/abhinandan-purkait/dev \
+            --target-namespace docker.io/abhinandanpurkait \
             --tag ${{ github.ref_name }}" ./scripts/staging/shell.nix
 
   release-kubectl-binaries:
@@ -64,13 +64,13 @@ jobs:
         run: |
           nix-shell --pure --run "./scripts/staging/pull-kubectl-from-ghcr.sh \
             --tag ${{ github.ref_name }} \
-            --namespace ghcr.io/${{ github.repository_owner }}/dev/kubectl-openebs \
+            --namespace ghcr.io/abhinandan-purkait/dev/kubectl-openebs \
             --username ${{ github.actor }} \
             --password ${{ secrets.GITHUB_TOKEN }}" ./scripts/staging/shell.nix
 
           ./mayastor/scripts/github/release-artifacts.sh \
             --tag ${{ github.ref_name }} \
-            --repo-org ${{ github.repository_owner }} \
+            --repo-org abhinandan-purkait \
             --upload ${{ github.event.repository.name }} \
             upload
 
@@ -93,7 +93,7 @@ jobs:
       - name: Fetch openebs umbrella helm chart
         env:
           RAW_TAG: ${{ github.ref_name }}
-          IMAGE_ORG: ${{ github.repository_owner }}
+          IMAGE_ORG: abhinandan-purkait
         run: |
           VERSION=${RAW_TAG#v}
 

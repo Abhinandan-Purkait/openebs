@@ -15,6 +15,6 @@ jobs:
           LATEST_VERSION=$(gh api repos/${{ github.repository_owner }}/openebs/releases/latest | jq -r '.tag_name')
           echo "Latest published version:$LATEST_VERSION"
           echo "latestTag=$LATEST_VERSION" >> "$GITHUB_OUTPUT"
-      - name: Update krew index
-        if: ${{ !github.event.release.prerelease && (steps.latest-release.outputs.latestTag == github.event.release.tag_name) }}
-        uses: rajatjindal/krew-release-bot@v0.0.47
+      # - name: Update krew index
+      #   if: ${{ !github.event.release.prerelease && (steps.latest-release.outputs.latestTag == github.event.release.tag_name) }}
+      #   uses: rajatjindal/krew-release-bot@v0.0.47

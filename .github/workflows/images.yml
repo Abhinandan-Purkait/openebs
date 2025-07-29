@@ -20,7 +20,7 @@ env:
 
 jobs:
   image-build-push:
-    runs-on: oracle-vm-8cpu-32gb-x86-64
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write

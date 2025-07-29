@@ -1,7 +1,7 @@
 apiVersion: v2
-version: 4.4.0-develop
+version: 5.10.0-prerelease
 name: openebs
-appVersion: 4.4.0-develop
+appVersion: 5.10.0-prerelease
 description: Containerized Attached Storage for Kubernetes
 icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
 home: https://www.openebs.io/
@@ -16,7 +16,7 @@ sources:
   - https://github.com/openebs/openebs
 dependencies:
   - name: openebs-crds
-    version: 4.4.0-develop
+    version: 5.10.0-prerelease
   - name: loki
     version: 6.29.0
     repository: https://grafana.github.io/helm-charts
@@ -47,6 +47,8 @@ dependencies:
 
 annotations:
   helm.sh/images: |
+    - name: etcd
+      image: docker.io/bitnami/etcd:3.5.6-debian-11-r10
     - name: etcd
       image: docker.io/bitnami/etcd:3.6.2-debian-12-r0
     - name: kubectl
@@ -96,13 +98,11 @@ annotations:
     - name: linux-utils
       image: openebs/linux-utils:4.2.0
     - name: lvm-driver
-      image: openebs/lvm-driver:1.8.0-develop
+      image: openebs/lvm-driver:1.7.0
     - name: provisioner-localpv
       image: openebs/provisioner-localpv:4.3.0
-    - name: provisioner-localpv
-      image: openebs/provisioner-localpv:4.4.0-develop
     - name: zfs-driver
-      image: openebs/zfs-driver:2.9.0-develop
+      image: openebs/zfs-driver:2.8.0
     - name: mc
       image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
     - name: minio

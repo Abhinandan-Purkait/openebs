@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/images.yml
     with:
       tag: ${{ inputs.tag }}
-      namespace: ghcr.io/${{ github.repository_owner }}/dev
+      namespace: ghcr.io/abhinandan-purkait/dev
     secrets: inherit
 
   build-binaries:
@@ -57,7 +57,7 @@ jobs:
         run: |
           nix-shell --pure --run "./scripts/staging/push-kubectl-to-ghcr.sh \
             --tag ${TAG} \
-            --namespace ghcr.io/${{ github.repository_owner }}/dev/kubectl-openebs \
+            --namespace ghcr.io/abhinandan-purkait/dev/kubectl-openebs \
             --username ${{ github.actor }} \
             --password ${{ secrets.GITHUB_TOKEN }}" ./scripts/staging/shell.nix
 
@@ -95,7 +95,7 @@ jobs:
         uses: appany/helm-oci-chart-releaser@v0.4.2
         with:
           name: openebs
-          repository: ${{ github.repository_owner }}/helm
+          repository: abhinandan-purkait/helm
           tag: ${{ env.CHART_VERSION }}
           path: ./charts
           registry: ghcr.io
