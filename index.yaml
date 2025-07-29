@@ -141,6 +141,8 @@ entries:
   - annotations:
       helm.sh/images: |
         - name: etcd
+          image: docker.io/bitnami/etcd:3.5.6-debian-11-r10
+        - name: etcd
           image: docker.io/bitnami/etcd:3.6.2-debian-12-r0
         - name: kubectl
           image: docker.io/bitnami/kubectl:1.25.15
@@ -189,13 +191,11 @@ entries:
         - name: linux-utils
           image: openebs/linux-utils:4.2.0
         - name: lvm-driver
-          image: openebs/lvm-driver:1.8.0-develop
+          image: openebs/lvm-driver:1.7.0
         - name: provisioner-localpv
           image: openebs/provisioner-localpv:4.3.0
-        - name: provisioner-localpv
-          image: openebs/provisioner-localpv:4.4.0-develop
         - name: zfs-driver
-          image: openebs/zfs-driver:2.9.0-develop
+          image: openebs/zfs-driver:2.8.0
         - name: mc
           image: quay.io/minio/mc:RELEASE.2024-11-21T17-21-54Z
         - name: minio
@@ -226,7 +226,7 @@ entries:
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
     apiVersion: v2
     appVersion: 5.10.0-prerelease
-    created: "2025-07-29T08:37:29.943579084Z"
+    created: "2025-07-29T09:28:12.079624888Z"
     dependencies:
     - name: openebs-crds
       repository: ""
@@ -259,7 +259,7 @@ entries:
       repository: https://openebs.github.io/mayastor-extensions
       version: 0.0.0
     description: Containerized Attached Storage for Kubernetes
-    digest: bdc6245a5dff5698dd47682160b4bba2c0470abadae607ee0b890ef37467b3b5
+    digest: 4e2f8231437f16b7f6058490cb08e3e64f777301293f021cb8deadd1f37fd8a2
     home: https://www.openebs.io/
     icon: https://raw.githubusercontent.com/cncf/artwork/HEAD/projects/openebs/icon/color/openebs-icon-color.png
     keywords:
@@ -1829,4 +1829,4 @@ entries:
     urls:
     - https://github.com/openebs/openebs/releases/download/openebs-4.0.0/openebs-4.0.0.tgz
     version: 4.0.0
-generated: "2025-07-29T08:37:29.900075405Z"
+generated: "2025-07-29T09:28:12.032650445Z"
